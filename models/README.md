@@ -1,0 +1,1 @@
+This folder contains large model weight files which are not tracked in Git. Add your `.pt` or other weight files here locally. If you need these in CI or deployments, consider publishing them to a release, artifact store, or provide a download script.

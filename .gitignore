@@ -1,0 +1,46 @@
+# OS / Editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+
+# Environments
+.env
+.env.*
+venv/
+.venv/
+**/venv/
+**/.venv/
+
+# Logs
+*.log
+
+# Django/Project specifics
+*.sqlite3
+db.sqlite3
+Django Application/db.sqlite3
+Django Application/**/__pycache__/
+
+# Datasets and large media (keep readme placeholders)
+Django Application/FaceForensics_Dataset/
+Django Application/manipulated_sequences/
+Django Application/original_sequences/
+
+uploaded_images/*
+!uploaded_images/Readme.txt
+
+uploaded_videos/*
+!uploaded_videos/Readme.txt
+
+# Model weights (root models folder). Keep README only.
+models/*
+!models/README.md
