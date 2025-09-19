@@ -3,17 +3,25 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Deepfake Video Detection | Sarthak Bhamare</title>
+    <title>Deepfake Detection</title>
+    <!-- CSS via CDN -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css" rel="stylesheet">
     <style>
-      body { padding-top: 56px; }
-      .hero { padding: 4rem 1rem; background: #0d6efd; color: #fff; }
-      .logo { max-height: 80px; }
-      code { background: #f5f5f5; padding: 0.125rem 0.25rem; border-radius: 4px; }
+      body { min-height: 100vh; display: flex; flex-direction: column; }
+      .bg-cover {
+        background-image: url('https://raw.githubusercontent.com/Sarthakbhamare/Deepfake-video-Detection-With-Deep-Learning/master/Django%20Application/static/images/background1.png');
+        background-position: center; background-repeat: no-repeat; background-size: cover;
+      }
+      .content-wrap { flex: 1 0 auto; }
+      .footer { flex-shrink: 0; }
+      .width-400{ width:400px; margin:auto; padding:20px; margin-top:80px; margin-bottom:150px; box-shadow:0 0px 9px 2px #ccc; background:#fff; border-radius:8px; }
+      #videos{ display:none; }
+      .logo img{ max-height:80px; }
     </style>
   </head>
   <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
       <div class="container">
         <a class="navbar-brand" href="#">Deepfake Detection</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav" aria-controls="nav" aria-expanded="false" aria-label="Toggle navigation">
@@ -21,75 +29,80 @@
         </button>
         <div class="collapse navbar-collapse" id="nav">
           <ul class="navbar-nav ms-auto">
-            <li class="nav-item"><a class="nav-link" href="https://github.com/Sarthakbhamare/Deepfake-video-Detection-With-Deep-Learning" target="_blank" rel="noopener">GitHub</a></li>
+            <li class="nav-item"><a class="nav-link" target="_blank" rel="noopener" href="https://github.com/Sarthakbhamare/Deepfake-video-Detection-With-Deep-Learning">GitHub</a></li>
           </ul>
         </div>
       </div>
     </nav>
 
-    <header class="hero text-center">
+    <div class="content-wrap bg-cover">
       <div class="container">
-        <img class="logo mb-3" src="../Django%20Application/static/images/logo1.png" alt="Logo">
-        <h1 class="display-5 fw-bold">Deepfake Video Detection</h1>
-        <p class="lead mb-0">ResNeXt + LSTM based detector — by Sarthak Bhamare</p>
-      </div>
-    </header>
-
-    <main class="container my-5">
-      <div class="row g-4">
-        <div class="col-12 col-lg-6">
-          <div class="card h-100">
-            <div class="card-body">
-              <h5 class="card-title">About this Project</h5>
-              <p class="card-text">
-                This static site is hosted on GitHub Pages. The full application is a Django backend
-                that performs video processing and model inference with PyTorch. Because GitHub Pages is
-                static-only, the live prediction feature requires a separate backend deployment.
-              </p>
-              <a class="btn btn-primary" href="https://github.com/Sarthakbhamare/Deepfake-video-Detection-With-Deep-Learning" target="_blank" rel="noopener">View Source on GitHub</a>
+        <div class="row align-items-center justify-content-center">
+          <div class="col-12 my-auto">
+            <div class="logo text-center mb-3">
+              <img src="https://raw.githubusercontent.com/Sarthakbhamare/Deepfake-video-Detection-With-Deep-Learning/master/Django%20Application/static/images/logo1.png" alt="Logo">
             </div>
-          </div>
-        </div>
-        <div class="col-12 col-lg-6">
-          <div class="card h-100">
-            <div class="card-body">
-              <h5 class="card-title">Run Locally</h5>
-              <ol class="card-text">
-                <li>Install Python 3.10+ and Git.</li>
-                <li>Clone the repo and create a venv.</li>
-                <li>Install dependencies from <code>Django Application/requirements.txt</code>.</li>
-                <li>Run migrations and start the server.</li>
-              </ol>
-              <pre class="bg-light p-3 small"><code>git clone https://github.com/Sarthakbhamare/Deepfake-video-Detection-With-Deep-Learning.git
-cd "Deepfake-video-Detection-With-Deep-Learning"
-python -m venv .venv
-.\.venv\Scripts\activate
-pip install --upgrade pip
-pip install -r "Django Application/requirements.txt"
-cd "Django Application"
-python manage.py migrate
-python manage.py runserver</code></pre>
-              <p class="mb-0">Then open <code>http://127.0.0.1:8000</code> in your browser.</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-12">
-          <div class="card h-100">
-            <div class="card-body">
-              <h5 class="card-title">Backend Deployment Options</h5>
-              <p class="card-text mb-2">To enable online predictions from this Pages site, deploy the Django backend on a host and enable CORS:</p>
-              <ul>
-                <li>Container hosts: Render, Railway, Fly.io, AWS, Azure App Service</li>
-                <li>Then update this page to point to your API endpoint</li>
-              </ul>
-              <p class="text-muted small mb-0">Note: The current Pages site is informational only; predictions require a running backend.</p>
+            <div class="width-400">
+              <video width="100%" controls id="videos">
+                <source src="" id="video_source">
+                Your browser does not support HTML5 video.
+              </video>
+              <form class="form text-center mt-3" onsubmit="return false;">
+                <div class="form-group text-start">
+                  <label for="videoFile">Upload Video</label>
+                  <input class="form-control" type="file" id="videoFile" accept="video/*">
+                </div>
+                <div class="form-group mt-3 text-start">
+                  <label for="sequence_length">Sequence Length: <span id="slider-value"></span></label>
+                  <input type="number" hidden id="sequence_length" name="sequence_length">
+                  <div id="slider"></div>
+                </div>
+                <button id="videoUpload" type="button" class="btn btn-success mt-3 w-100" disabled>Upload (Backend not connected)</button>
+                <div class="form-text mt-2">This is a static demo on GitHub Pages. To enable predictions, deploy the backend and connect it here.</div>
+              </form>
             </div>
           </div>
         </div>
       </div>
-    </main>
+    </div>
 
+    <footer class="footer py-3 bg-light">
+      <div class="container text-center"><span class="text-muted">&copy; <span id="y"></span> Sarthak Bhamare</span></div>
+    </footer>
+
+    <!-- JS via CDN -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+    <script>
+      document.getElementById('y').textContent = new Date().getFullYear();
+      $(function () {
+        var sliderSequenceNumbers = [10,20,40,60,80,100];
+        var slider = $("div#slider").slider({
+          value: 1,
+          min: 0,
+          max: sliderSequenceNumbers.length-1,
+          slide: function (event, ui) {
+            $('#sequence_length').val(sliderSequenceNumbers[ui.value]);
+            $('#slider-value').html(sliderSequenceNumbers[ui.value]);
+          }
+        });
+        $("#sequence_length").val(sliderSequenceNumbers[$("#slider").slider("value")]);
+        $('#slider-value').html(sliderSequenceNumbers[$("#slider").slider("value")]);
+      });
+
+      // Preview selected video in the player
+      const fileInput = document.getElementById('videoFile');
+      const videoEl = document.getElementById('videos');
+      const sourceEl = document.getElementById('video_source');
+      fileInput.addEventListener('change', function() {
+        const f = this.files && this.files[0];
+        if (!f) return;
+        const url = URL.createObjectURL(f);
+        sourceEl.src = url;
+        videoEl.load();
+        videoEl.style.display = 'block';
+      });
+    </script>
   </body>
   </html>
